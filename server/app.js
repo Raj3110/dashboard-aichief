@@ -8,7 +8,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URI,
     credentials: true,
   })
 );
@@ -124,16 +124,19 @@ app.post("/api/submit-details", async (req, res) => {
       .padStart(2, "0")}${now.getMinutes().toString().padStart(2, "0")}${now
       .getSeconds()
       .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}`.slice(-6);
 
-    const userId = firstName+'_'+formattedTime;
+    const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    const capitalizedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+
+    const userId = capitalizedName + formattedTime;
 
     const dobParts = dob.split("-");
     const password = `${dobParts[2]}${dobParts[1]}${dobParts[0].slice(-2)}`;
 
     const newUser = {
-      firstName,
-      lastName,
+      firstName:capitalizedName,
+      lastName:capitalizedLastName,
       email,
       phone,
       dob,
