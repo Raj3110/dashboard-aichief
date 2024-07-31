@@ -158,7 +158,7 @@ app.post("/api/submit-details", async (req, res) => {
 async function startServer() {
   await connectToDatabase();
 
-  const PORT = 5000;
+  const PORT = process.env.PORT;
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
