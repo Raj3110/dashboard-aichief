@@ -14,8 +14,8 @@ app.use(
 );
 app.use(bodyParser.json());
 
-const db_name = "aichefmaster";
-const db_collection = "user_details";
+const db_name = "AI_Chef_Master";
+const db_collection = "Chef";
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, {
@@ -92,68 +92,68 @@ app.post("/api/verify-email-otp", (req, res) => {
   }
 });
 
-app.post("/api/submit-details", async (req, res) => {
-  const { firstName, lastName, email, phone, dob } = req.body;
-
-  if (phone.length !== 10) {
-    return res.status(400).json({ message: "Phone number must be 10 digits" });
-  }
-
-  try {
-    const existingUser = await db.collection(db_collection).findOne({
-      $or: [{ phone: phone }, { email: email }],
-    });
-
-    if (existingUser) {
-      if (existingUser.phone === phone) {
-        return res
-          .status(400)
-          .json({ message: "Phone number already registered" });
-      }
-      if (existingUser.email === email) {
-        return res.status(400).json({ message: "Email already registered" });
-      }
+  app.post("/api/submit-details", async (req, res) => {
+    const { firstName, lastName, email, phone, dob } = req.body;
+  
+    if (phone.length !== 10) {
+      return res.status(400).json({ message: "Phone number must be 10 digits" });
     }
-
-    const now = new Date();
-    const formattedTime = `${now.getFullYear()}${(now.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}${now
-      .getHours()
-      .toString()
-      .padStart(2, "0")}${now.getMinutes().toString().padStart(2, "0")}${now
-      .getSeconds()
-      .toString()
-      .padStart(2, "0")}`.slice(-6);
-
-    const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
-    const capitalizedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-
-    const userId = capitalizedName + formattedTime;
-
-    const dobParts = dob.split("-");
-    const password = `${dobParts[2]}${dobParts[1]}${dobParts[0].slice(-2)}`;
-
-    const newUser = {
-      firstName:capitalizedName,
-      lastName:capitalizedLastName,
-      email,
-      phone,
-      dob,
-      userId,
-      password,
-    };
-
-    const result = await db.collection(db_collection).insertOne(newUser);
-    res.json({
-      message: "User registered successfully",
-      userId: newUser.userId,
-    });
-  } catch (error) {
-    console.error("Error inserting user:", error);
-    res.status(500).json({ message: "Error registering user" });
-  }
-});
+  
+    try {
+      const existingUser = await db.collection(db_collection).findOne({
+        $or: [{ phone: phone }, { email: email }],
+      });
+  
+      if (existingUser) {
+        if (existingUser.phone === phone) {
+          return res
+            .status(400)
+            .json({ message: "Phone number already registered" });
+        }
+        if (existingUser.email === email) {
+          return res.status(400).json({ message: "Email already registered" });
+        }
+      }
+  
+      const now = new Date();
+      const formattedTime = `${now.getFullYear()}${(now.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}${now
+        .getHours()
+        .toString()
+        .padStart(2, "0")}${now.getMinutes().toString().padStart(2, "0")}${now
+        .getSeconds()
+        .toString()
+        .padStart(2, "0")}`.slice(-6);
+  
+      const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+      const capitalizedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+  
+      const userId = capitalizedName + formattedTime;
+  
+      const dobParts = dob.split("-");
+      const password = `${dobParts[2]}${dobParts[1]}${dobParts[0].slice(-2)}`;
+  
+      const newUser = {
+        firstName:capitalizedName,
+        lastName:capitalizedLastName,
+        email,
+        phone,
+        dob,
+        userId,
+        password,
+      };
+  
+      const result = await db.collection(db_collection).insertOne(newUser);
+      res.json({
+        message: "User registered successfully",
+        userId: newUser.userId,
+      });
+    } catch (error) {
+      console.error("Error inserting user:", error);
+      res.status(500).json({ message: "Error registering user" });
+    }
+  });
 
 async function startServer() {
   await connectToDatabase();
