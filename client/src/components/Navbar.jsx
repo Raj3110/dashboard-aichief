@@ -18,7 +18,7 @@ const Navbar = ({ theme, setTheme }) => {
       <h1 className="text-3xl font-semibold font-primary flex items-center justify-between gap-x-2">
         <a href="/">
           <img
-            src="src/assets/logo.jpeg"
+            src="https://www.aichefmaster.com/assets/logo.jpeg"
             width={40}
             className="rounded-md"
             alt="logo"
